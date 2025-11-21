@@ -1,0 +1,14 @@
+
+.DS_Store
+Thumbs.db
+
+
+node_modules/
+dist/
+.sass-cache/
+
+
+.vscode/
+.idea/
+
+*.log
