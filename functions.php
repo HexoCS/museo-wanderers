@@ -95,3 +95,81 @@ function museo_procesar_voto( WP_REST_Request $request ) {
         'type' => $tipo
     );
 }
+
+// functions.php
+
+// 5. REGISTRAR TAXONOMÍA "ETIQUETAS" (Tags)
+function museo_registrar_taxonomias() {
+    $labels = array(
+        'name'              => 'Etiquetas de Obra',
+        'singular_name'     => 'Etiqueta',
+        'search_items'      => 'Buscar Etiquetas',
+        'all_items'         => 'Todas las Etiquetas',
+        'edit_item'         => 'Editar Etiqueta',
+        'update_item'       => 'Actualizar Etiqueta',
+        'add_new_item'      => 'Añadir Nueva Etiqueta',
+        'new_item_name'     => 'Nombre de la nueva etiqueta',
+        'menu_name'         => 'Etiquetas',
+    );
+
+    $args = array(
+        'hierarchical'      => false, // False = Comportamiento tipo Tag (nube). True = Tipo Categoría (checkbox)
+        'labels'            => $labels,
+        'show_ui'           => true,
+        'show_admin_column' => true,
+        'query_var'         => true,
+        'rewrite'           => array( 'slug' => 'tema' ), // URL amigable: tudominio.com/tema/1970
+    );
+
+    register_taxonomy( 'etiqueta_obra', array( 'obra' ), $args );
+}
+add_action( 'init', 'museo_registrar_taxonomias' );
+
+
+/**
+ * BUSQUEDA AVANZADA: Incluir Taxonomías (Tags) en los resultados de búsqueda.
+ * Hace un JOIN en la consulta SQL para mirar también en la tabla de términos.
+ */
+function museo_buscar_en_tags( $search, $wp_query ) {
+    global $wpdb;
+
+    // Solo aplicar en frontend, búsqueda principal y si no está vacía
+    if ( empty( $search ) || ! is_search() || ! ! is_admin() )
+        return $search;
+
+    // Obtener las variables de búsqueda
+    $q = $wp_query->query_vars;
+    $n = ! empty( $q['exact'] ) ? '' : '%';
+    $search = $searchand = '';
+
+    foreach ( (array) $q['search_terms'] as $term ) {
+        $term = esc_sql( $wpdb->esc_like( $term ) );
+        
+        // Esta es la MAGIA SQL:
+        // Busca en (Título) OR (Contenido) OR (Taxonomía/Tag asociado)
+        $search .= "{$searchand} (
+            ($wpdb->posts.post_title LIKE '{$n}{$term}{$n}') OR 
+            ($wpdb->posts.post_content LIKE '{$n}{$term}{$n}') OR
+            EXISTS (
+                SELECT * FROM {$wpdb->term_relationships}
+                INNER JOIN {$wpdb->term_taxonomy} ON {$wpdb->term_taxonomy}.term_taxonomy_id = {$wpdb->term_relationships}.term_taxonomy_id
+                INNER JOIN {$wpdb->terms} ON {$wpdb->terms}.term_id = {$wpdb->term_taxonomy}.term_id
+                WHERE 
+                    1=1 
+                    AND {$wpdb->term_relationships}.object_id = {$wpdb->posts}.ID 
+                    AND {$wpdb->term_taxonomy}.taxonomy = 'etiqueta_obra'
+                    AND {$wpdb->terms}.name LIKE '{$n}{$term}{$n}'
+            )
+        )";
+        $searchand = ' AND ';
+    }
+
+    if ( ! empty( $search ) ) {
+        $search = " AND ({$search}) ";
+        if ( ! is_user_logged_in() )
+            $search .= " AND ($wpdb->posts.post_password = '') ";
+    }
+
+    return $search;
+}
+add_filter( 'posts_search', 'museo_buscar_en_tags', 500, 2 );

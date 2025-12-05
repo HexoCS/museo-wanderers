@@ -23,11 +23,21 @@ if ( 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['moderacion_action']
     $accion  = $_POST['moderacion_action'];
 
     if ( $accion === 'aprobar' ) {
-        // Publicar la obra
+        
+        // A. PROCESAR ETIQUETAS (TAGS)
+        if ( isset( $_POST['tags_input'] ) && ! empty( $_POST['tags_input'] ) ) {
+            $tags_texto = sanitize_text_field( $_POST['tags_input'] );
+            // Convertimos "1970, camiseta" -> ['1970', 'camiseta']
+            $tags_array = explode( ',', $tags_texto ); 
+            wp_set_object_terms( $obra_id, $tags_array, 'etiqueta_obra' );
+        }
+
+        // B. PUBLICAR LA OBRA
         $update = wp_update_post( array(
             'ID'          => $obra_id,
             'post_status' => 'publish'
         ) );
+        
         if ( $update ) $msg = '<div style="background:#d4edda; color:#155724; padding:1rem; margin-bottom:1rem;">¡Obra aprobada y publicada!</div>';
     
     } elseif ( $accion === 'rechazar' ) {
@@ -86,23 +96,28 @@ get_header();
                             <div style="font-style: italic;"><?php the_content(); ?></div>
                         </div>
 
-                        <div style="display: flex; gap: 1rem; align-items: center;">
+                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
                             
-                            <form method="POST">
+                            <form method="POST" style="display: flex; flex-direction: column; gap: 0.5rem; background: #e8f5e9; padding: 10px; border-radius: 5px; width: 100%; max-width: 300px;">
                                 <?php wp_nonce_field( 'procesar_obra', 'mod_nonce' ); ?>
                                 <input type="hidden" name="obra_id" value="<?php the_ID(); ?>">
                                 <input type="hidden" name="moderacion_action" value="aprobar">
-                                <button type="submit" class="btn" style="border:none; cursor:pointer;">✅ Aprobar y Publicar</button>
+                                
+                                <label style="font-size: 0.8rem; font-weight: bold; color: #155724;">Etiquetas (separar con comas):</label>
+                                <input type="text" name="tags_input" placeholder="Ej: 1970, camiseta, final" 
+                                       style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
+                                
+                                <button type="submit" class="btn" style="border:none; cursor:pointer; margin-top: 5px;">✅ Aprobar y Publicar</button>
                             </form>
 
-                            <form method="POST" onsubmit="return confirm('¿Estás seguro de borrar esta obra?');">
+                            <form method="POST" onsubmit="return confirm('¿Estás seguro de borrar esta obra?');" style="margin-top: auto;">
                                 <?php wp_nonce_field( 'procesar_obra', 'mod_nonce' ); ?>
                                 <input type="hidden" name="obra_id" value="<?php the_ID(); ?>">
                                 <input type="hidden" name="moderacion_action" value="rechazar">
                                 <button type="submit" class="btn" style="background:#dc3545; border:none; cursor:pointer;">🗑 Rechazar</button>
                             </form>
 
-                            <a href="<?php echo get_edit_post_link(); ?>" target="_blank" class="btn" style="background:#007bff; text-decoration:none;">✏️ Editar Datos</a>
+                            <a href="<?php echo get_edit_post_link(); ?>" target="_blank" class="btn" style="background:#007bff; text-decoration:none; margin-top: auto;">✏️ Editar Datos</a>
                         </div>
                     </div>
 

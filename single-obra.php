@@ -15,14 +15,13 @@ get_header(); ?>
         $current_obra_id = get_the_ID();
 
         // --- LÓGICA DE VOTOS (Backend -> Frontend) ---
-        // 1. Recuperamos los contadores actuales de la base de datos
         $likes = (int) get_post_meta( $current_obra_id, '_museo_likes', true );
         $dislikes = (int) get_post_meta( $current_obra_id, '_museo_dislikes', true );
 
-        // 2. Verificamos si el usuario ya tiene la cookie de esta obra
+        // Verificamos cookie
         $ya_voto = isset($_COOKIE['voto_obra_' . $current_obra_id]);
 
-        // 3. Definimos estilos para el estado "Deshabilitado"
+        // Estilos condicionales
         $disabled_attr = $ya_voto ? 'disabled' : '';
         $cursor_style  = $ya_voto ? 'cursor: not-allowed; opacity: 0.6;' : 'cursor: pointer;';
         $bg_like       = $ya_voto ? '#ccc' : '#28a745';
@@ -35,7 +34,19 @@ get_header(); ?>
                 <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;"><?php the_title(); ?></h1>
                 
                 <div style="color: #666; font-size: 0.9rem; display: flex; gap: 1rem;">
-                    <span><strong>Autor:</strong> <?php the_author(); ?></span>
+                    <span>
+                        <strong>Autor:</strong> 
+                        <?php 
+                        // CAMBIO 3: Lógica para mostrar Autor Externo si existe
+                        $autor_externo = get_post_meta( get_the_ID(), 'nombre_autor_externo', true );
+                        
+                        if ( ! empty( $autor_externo ) ) {
+                            echo esc_html( $autor_externo ); // Muestra el nombre del formulario
+                        } else {
+                            the_author(); // Fallback: Muestra dev_museo
+                        }
+                        ?>
+                    </span>
                     <span><strong>Fecha:</strong> <?php echo get_the_date(); ?></span>
                 </div>
             </header>
@@ -49,6 +60,29 @@ get_header(); ?>
             <div class="contenido-obra" style="font-size: 1.1rem; line-height: 1.8; max-width: 800px; margin: 0 auto;">
                 <?php the_content(); ?>
             </div>
+
+            <?php 
+            // Recuperar los términos de la taxonomía personalizada
+            $tags = get_the_terms( get_the_ID(), 'etiqueta_obra' ); 
+            
+            // Solo mostrar si hay etiquetas y no hay error
+            if ( $tags && ! is_wp_error( $tags ) ) : 
+            ?>
+                <div style="max-width: 800px; margin: 2rem auto 0 auto;">
+                    <details style="cursor: pointer;">
+                        <summary style="font-weight: bold; color: #0f4c29; list-style: none;">
+                            Ver Etiquetas de esta obra ▾
+                        </summary>
+                        <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 10px; background: #f9f9f9; border-radius: 8px;">
+                            <?php foreach ( $tags as $tag ) : ?>
+                                <span style="background: #e8f5e9; border: 1px solid #c8e6c9; padding: 4px 12px; border-radius: 15px; font-size: 0.85rem; color: #2e7d32;">
+                                    <?php echo $tag->name; ?>
+                                </span>
+                            <?php endforeach; ?>
+                        </div>
+                    </details>
+                </div>
+            <?php endif; ?>
 
             <div style="margin-top: 3rem; text-align: center; padding: 1.5rem; background: #f0f0f0; border-radius: 50px; display: inline-block;">
                 
