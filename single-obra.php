@@ -13,6 +13,20 @@ get_header(); ?>
     while ( have_posts() ) : the_post(); 
         // Guardamos el ID para excluirlo después en "Otras obras"
         $current_obra_id = get_the_ID();
+
+        // --- LÓGICA DE VOTOS (Backend -> Frontend) ---
+        // 1. Recuperamos los contadores actuales de la base de datos
+        $likes = (int) get_post_meta( $current_obra_id, '_museo_likes', true );
+        $dislikes = (int) get_post_meta( $current_obra_id, '_museo_dislikes', true );
+
+        // 2. Verificamos si el usuario ya tiene la cookie de esta obra
+        $ya_voto = isset($_COOKIE['voto_obra_' . $current_obra_id]);
+
+        // 3. Definimos estilos para el estado "Deshabilitado"
+        $disabled_attr = $ya_voto ? 'disabled' : '';
+        $cursor_style  = $ya_voto ? 'cursor: not-allowed; opacity: 0.6;' : 'cursor: pointer;';
+        $bg_like       = $ya_voto ? '#ccc' : '#28a745';
+        $bg_dislike    = $ya_voto ? '#ccc' : '#dc3545';
     ?>
 
         <article style="background: white; padding: 2rem; border-radius: 8px; border: 1px solid #ddd;">
@@ -37,12 +51,23 @@ get_header(); ?>
             </div>
 
             <div style="margin-top: 3rem; text-align: center; padding: 1.5rem; background: #f0f0f0; border-radius: 50px; display: inline-block;">
-                <button style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-right: 10px;">
-                    👍 Me gusta <span id="like-count">0</span>
+                
+                <button class="btn-voto" 
+                        data-id="<?php echo $current_obra_id; ?>" 
+                        data-tipo="like" 
+                        <?php echo $disabled_attr; ?>
+                        style="background: <?php echo $bg_like; ?>; color: white; border: none; padding: 10px 20px; border-radius: 20px; margin-right: 10px; <?php echo $cursor_style; ?>">
+                    👍 Me gusta <span><?php echo $likes; ?></span>
                 </button>
-                <button style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">
-                    👎 No me gusta <span id="dislike-count">0</span>
+                
+                <button class="btn-voto" 
+                        data-id="<?php echo $current_obra_id; ?>" 
+                        data-tipo="dislike" 
+                        <?php echo $disabled_attr; ?>
+                        style="background: <?php echo $bg_dislike; ?>; color: white; border: none; padding: 10px 20px; border-radius: 20px; <?php echo $cursor_style; ?>">
+                    👎 No me gusta <span><?php echo $dislikes; ?></span>
                 </button>
+
             </div>
 
         </article>
@@ -60,8 +85,8 @@ get_header(); ?>
             $related_args = array(
                 'post_type'      => 'obra',
                 'posts_per_page' => 3,
-                'post__not_in'   => array( $current_obra_id ), // <--- Magia de ingeniería: Exclusión por ID
-                'orderby'        => 'rand' // Aleatorio para descubrimiento
+                'post__not_in'   => array( $current_obra_id ), 
+                'orderby'        => 'rand' 
             );
             $related_query = new WP_Query( $related_args );
 
@@ -80,7 +105,7 @@ get_header(); ?>
                     </article>
 
                 <?php endwhile;
-                wp_reset_postdata(); // OBLIGATORIO: Restaurar datos para no romper el footer
+                wp_reset_postdata(); 
             else : ?>
                 <p>No hay más obras para mostrar.</p>
             <?php endif; ?>
