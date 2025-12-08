@@ -13,7 +13,7 @@
         <div class="navbar-capsula">
             
             <a href="<?php echo home_url(); ?>" class="site-title-text">
-                Wanderers
+                Corporación Wanderers
             </a>
             
             <nav class="main-nav">
