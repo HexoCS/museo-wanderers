@@ -7,21 +7,33 @@
 </head>
 <body <?php body_class(); ?>>
 
-<header style="background: #0f4c29; color: white; padding: 1rem 0;">
-    <div class="container">
-        <nav style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="logo" style="font-weight: bold; font-size: 1.5rem;">
-                <a href="<?php echo home_url(); ?>">Museo Wanderers</a>
-            </div>
+<header>
+    <div class="container header-layout">
+        
+        <div class="navbar-capsula">
             
-            <ul style="display: flex; gap: 1rem;">
-                <li><a href="#">Inicio</a></li>
-                <li><a href="#">Institución</a></li>
-                <li><a href="#">Noticias</a></li>
-                <li><a href="#">Escuelas</a></li>
-                <li><a href="<?php echo home_url(); ?>" style="text-decoration: underline;">MUSEO</a></li>
-            </ul>
-        </nav>
+            <a href="<?php echo home_url(); ?>" class="site-title-text">
+                Wanderers
+            </a>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="https://corporacionwanderers.cl/">Inicio</a></li>
+                    <li><a href="https://corporacionwanderers.cl/quienes-somos/">Institución</a></li>
+                    <li><a href="https://corporacionwanderers.cl/noticias/">Noticias</a></li>
+                    <li><a href="https://corporacionwanderers.cl/ramas-deportivas/">Ramas deportivas</a></li>
+                    <li><a href="<?php echo home_url(); ?>" class="active">Museo</a></li>
+                </ul>
+            </nav>
+
+        </div>
+        
+        <div class="logo-container">
+            <a href="<?php echo home_url(); ?>">
+                <img src="<?php echo get_template_directory_uri(); ?>/assets/svg/logo_corpo.svg" alt="Wanderers" class="escudo-big">
+            </a>
+        </div>
+
     </div>
 </header>
 

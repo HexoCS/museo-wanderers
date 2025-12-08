@@ -1,20 +1,185 @@
 /*
 Theme Name: Museo Wanderers
-Author: Bruno Bonati
+Author: Tu Nombre
 Description: Tema a medida para el museo histórico del club.
 Version: 1.0.0
 Text Domain: museo-theme
 */
 
-/* RESET BÁSICO (Para modo Wireframe) */
+/* =========================================
+   1. CARGA DE FUENTES (Typography)
+   ========================================= */
+
+
+/* Textos de Cuerpo (Lectura) - Usaremos Poppins que se lee bien en web */
+@font-face {
+    font-family: 'Poppins';
+    src: url('assets/fonts/Poppins-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('assets/fonts/Poppins-Medium.ttf') format('truetype');
+    font-weight: 500; /* Medium */
+    font-style: normal;
+    font-display: swap;
+}
+
+/* =========================================
+   2. VARIABLES GLOBALES (Design Tokens)
+   ========================================= */
+:root {
+    /* Paleta de Colores */
+    --color-primario: #08311f;   /* Un verde más oscuro*/
+    --color-secundario: #c5a059; /* Dorado */
+    --color-texto: #ffffff;
+    --color-blanco: #ffffff;
+   
+    --bg-capsula: rgba(70, 120, 90, 0.6); /* Verde claro visible */
+
+    /* Tipografías */
+    --font-titulo: 'Poppins', sans-serif; 
+    --font-cuerpo: 'Poppins', sans-serif;
+    
+    /* Layout */
+    --ancho-maximo: 1200px;
+    --radio-borde: 8px;
+}
+
+/* =========================================
+   3. RESET & BASE
+   ========================================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: sans-serif; line-height: 1.6; background: #f4f4f4; color: #333; }
-img { max-width: 100%; height: auto; }
-a { text-decoration: none; color: inherit; }
+
+body {
+    font-family: var(--font-cuerpo);
+    color: var(--color-texto);
+    line-height: 1.6;
+    
+    /* EL FONDO DEL SITIO */
+    background-image: url('assets/images/bg_horizontal.webp');
+    background-size: cover;       /* Cubrir toda la pantalla */
+    background-position: center top;
+    background-attachment: fixed; /* Efecto Parallax: el fondo se queda quieto al hacer scroll */
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+/* Imágenes responsivas */
+img { max-width: 100%; height: auto; display: block; }
+a { text-decoration: none; color: inherit; transition: 0.3s; }
 ul { list-style: none; }
 
-/* LAYOUT TEMPORAL */
-.container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
-.card { background: white; border: 1px solid #ddd; padding: 1rem; border-radius: 8px; }
-.btn { display: inline-block; background: #0f4c29; color: white; padding: 0.5rem 1rem; border-radius: 4px; margin-top: 1rem; }
+/* Contenedor central */
+.container {
+    max-width: var(--ancho-maximo);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+
+/* =========================================
+   4.  NAVBAR 
+   ========================================= */
+
+header {
+    background: linear-gradient(to right, #08311f 0%, #08311f 70%, #000000 100%);
+    padding: 1.5rem 0; /* Espacio arriba y abajo para que respire */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    /* Eliminamos el borde dorado inferior para ser fieles a tu diseño */
+    /* border-bottom: 4px solid var(--color-secundario); */
+}
+
+/* Contenedor Flex: Logo (Izq) - Cápsula (Centro-Derecha) */
+.header-layout {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+/* --- ESTILO DE LA CÁPSULA (El Óvalo) --- */
+.navbar-capsula {
+    background-color: var(--bg-capsula); /* El color verde claro transparente */
+    border-radius: 50px; /* Bordes totalmente redondos (Pill shape) */
+    padding: 0.8rem 2.5rem; /* Relleno interno */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-grow: 1; /* Ocupa todo el espacio posible */
+    backdrop-filter: blur(5px); /* Efecto vidrio (opcional, se ve moderno) */
+}
+
+/* --- TIPOGRAFÍA DEL TÍTULO (Arreglado) --- */
+.site-title-text {
+    font-family: var(--font-cuerpo) !important; /* Usamos Poppins */
+    font-weight: 400 !important; /* Regular weight, más ligero */
+    font-size: 1.4rem !important;
+    color: var(--color-blanco) !important;
+    text-transform: none !important;
+    letter-spacing: 0.5px;
+    flex-shrink: 0; /* No se encoge */
+    font-style: normal !important; /* Eliminar cursiva FORZADO */
+}
+
+/* --- MENÚ --- */
+.main-nav ul {
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+}
+
+.main-nav a {
+    color: var(--color-blanco);
+    font-family: var(--font-cuerpo);
+    font-size: 0.85rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    opacity: 0.95;
+    white-space: nowrap;
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+    color: var(--color-secundario); /* Dorado al pasar mouse */
+    opacity: 1;
+}
+
+/* --- LOGO GRANDE DERECHA --- */
+.logo-container {
+    flex-shrink: 0;
+    margin-left: auto; /* Empuja el logo a la derecha */
+}
+
+.escudo-big {
+    height: 90px; /* Tamaño grande del logo */
+    width: auto;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); /* Sombra para que destaque */
+    transition: transform 0.3s ease;
+}
+
+.escudo-big:hover {
+    transform: scale(1.05); /* Efecto zoom sutil */
+}
+
+/* Ajuste Responsive (Móvil) - Básico por ahora */
+@media (max-width: 768px) {
+    .header-layout {
+        flex-direction: column;
+    }
+    .navbar-capsula {
+        flex-direction: column;
+        width: 100%;
+        border-radius: 20px;
+        gap: 1rem;
+    }
+    .main-nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
