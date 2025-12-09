@@ -6,119 +6,107 @@
 
 get_header(); ?>
 
-<main class="container" style="padding: 2rem 0;">
+<main class="single-obra-container">
+    <div class="container">
 
     <?php
     // LOOP PRINCIPAL (La obra actual)
     while ( have_posts() ) : the_post(); 
-        // Guardamos el ID para excluirlo después en "Otras obras"
         $current_obra_id = get_the_ID();
 
-        // --- LÓGICA DE VOTOS (Backend -> Frontend) ---
+        // --- LÓGICA DE VOTOS ---
         $likes = (int) get_post_meta( $current_obra_id, '_museo_likes', true );
         $dislikes = (int) get_post_meta( $current_obra_id, '_museo_dislikes', true );
 
-        // Verificamos cookie
         $ya_voto = isset($_COOKIE['voto_obra_' . $current_obra_id]);
-
-        // Estilos condicionales
         $disabled_attr = $ya_voto ? 'disabled' : '';
-        $cursor_style  = $ya_voto ? 'cursor: not-allowed; opacity: 0.6;' : 'cursor: pointer;';
-        $bg_like       = $ya_voto ? '#ccc' : '#28a745';
-        $bg_dislike    = $ya_voto ? '#ccc' : '#dc3545';
     ?>
 
-        <article style="background: white; padding: 2rem; border-radius: 8px; border: 1px solid #ddd;">
+        <article class="obra-detalle">
             
-            <header style="margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
-                <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;"><?php the_title(); ?></h1>
+            <!-- Layout de 2 Columnas -->
+            <div class="obra-layout">
                 
-                <div style="color: #666; font-size: 0.9rem; display: flex; gap: 1rem;">
-                    <span>
-                        <strong>Autor:</strong> 
-                        <?php 
-                        // CAMBIO 3: Lógica para mostrar Autor Externo si existe
-                        $autor_externo = get_post_meta( get_the_ID(), 'nombre_autor_externo', true );
+                <!-- Columna Izquierda: Imagen -->
+                <div class="obra-imagen-grande">
+                    <?php if ( has_post_thumbnail() ) : ?>
+                        <?php the_post_thumbnail('large'); ?>
+                    <?php else : ?>
+                        <div class="sin-imagen-grande">Sin Imagen</div>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Columna Derecha: Información -->
+                <div class="obra-info-detalle">
+                    <h1 class="obra-titulo-detalle"><?php the_title(); ?></h1>
+                    
+                    <div class="obra-contenido">
+                        <?php the_content(); ?>
+                    </div>
+                    
+                    <div class="obra-autor">
+                        <strong>Nombre Autor</strong>
+                        <p>
+                            <?php 
+                            $autor_externo = get_post_meta( get_the_ID(), 'nombre_autor_externo', true );
+                            
+                            if ( ! empty( $autor_externo ) ) {
+                                echo esc_html( $autor_externo );
+                            } else {
+                                the_author();
+                            }
+                            ?>
+                        </p>
+                    </div>
+                    
+                    <!-- Botones de Votación -->
+                    <div class="votos-container">
+                        <button class="btn-voto btn-like" 
+                                data-id="<?php echo $current_obra_id; ?>" 
+                                data-tipo="like" 
+                                <?php echo $disabled_attr; ?>>
+                            <img src="<?php echo get_template_directory_uri(); ?>/assets/svg/like.svg" alt="Like" class="icono-voto-svg">
+                            <span class="contador-voto"><?php echo $likes; ?></span>
+                        </button>
                         
-                        if ( ! empty( $autor_externo ) ) {
-                            echo esc_html( $autor_externo ); // Muestra el nombre del formulario
-                        } else {
-                            the_author(); // Fallback: Muestra dev_museo
-                        }
-                        ?>
-                    </span>
-                    <span><strong>Fecha:</strong> <?php echo get_the_date(); ?></span>
-                </div>
-            </header>
-
-            <?php if ( has_post_thumbnail() ) : ?>
-                <div style="margin-bottom: 2rem; text-align: center; background: #f9f9f9; padding: 1rem;">
-                    <?php the_post_thumbnail('large', ['style' => 'max-height: 500px; width: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);']); ?>
-                </div>
-            <?php endif; ?>
-
-            <div class="contenido-obra" style="font-size: 1.1rem; line-height: 1.8; max-width: 800px; margin: 0 auto;">
-                <?php the_content(); ?>
-            </div>
-
-            <?php 
-            // Recuperar los términos de la taxonomía personalizada
-            $tags = get_the_terms( get_the_ID(), 'etiqueta_obra' ); 
-            
-            // Solo mostrar si hay etiquetas y no hay error
-            if ( $tags && ! is_wp_error( $tags ) ) : 
-            ?>
-                <div style="max-width: 800px; margin: 2rem auto 0 auto;">
-                    <details style="cursor: pointer;">
-                        <summary style="font-weight: bold; color: #0f4c29; list-style: none;">
-                            Ver Etiquetas de esta obra ▾
-                        </summary>
-                        <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 10px; background: #f9f9f9; border-radius: 8px;">
+                        <button class="btn-voto btn-dislike" 
+                                data-id="<?php echo $current_obra_id; ?>" 
+                                data-tipo="dislike" 
+                                <?php echo $disabled_attr; ?>>
+                            <img src="<?php echo get_template_directory_uri(); ?>/assets/svg/dislike.svg" alt="Dislike" class="icono-voto-svg">
+                            <span class="contador-voto"><?php echo $dislikes; ?></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Etiquetas de la Obra -->
+                    <?php 
+                    $tags = get_the_terms( get_the_ID(), 'etiqueta_obra' ); 
+                    
+                    if ( $tags && ! is_wp_error( $tags ) ) : 
+                    ?>
+                        <div class="etiquetas-container">
                             <?php foreach ( $tags as $tag ) : ?>
-                                <span style="background: #e8f5e9; border: 1px solid #c8e6c9; padding: 4px 12px; border-radius: 15px; font-size: 0.85rem; color: #2e7d32;">
-                                    <?php echo $tag->name; ?>
-                                </span>
+                                <span class="etiqueta-badge"><?php echo esc_html( $tag->name ); ?></span>
                             <?php endforeach; ?>
                         </div>
-                    </details>
+                    <?php endif; ?>
                 </div>
-            <?php endif; ?>
-
-            <div style="margin-top: 3rem; text-align: center; padding: 1.5rem; background: #f0f0f0; border-radius: 50px; display: inline-block;">
                 
-                <button class="btn-voto" 
-                        data-id="<?php echo $current_obra_id; ?>" 
-                        data-tipo="like" 
-                        <?php echo $disabled_attr; ?>
-                        style="background: <?php echo $bg_like; ?>; color: white; border: none; padding: 10px 20px; border-radius: 20px; margin-right: 10px; <?php echo $cursor_style; ?>">
-                    👍 Me gusta <span><?php echo $likes; ?></span>
-                </button>
-                
-                <button class="btn-voto" 
-                        data-id="<?php echo $current_obra_id; ?>" 
-                        data-tipo="dislike" 
-                        <?php echo $disabled_attr; ?>
-                        style="background: <?php echo $bg_dislike; ?>; color: white; border: none; padding: 10px 20px; border-radius: 20px; <?php echo $cursor_style; ?>">
-                    👎 No me gusta <span><?php echo $dislikes; ?></span>
-                </button>
-
             </div>
 
         </article>
 
-    <?php endwhile; // Fin del Loop Principal ?>
+    <?php endwhile; ?>
 
-    <hr style="margin: 3rem 0; border: 0; border-top: 2px solid #eee;">
-
-    <section>
-        <h3 style="margin-bottom: 1.5rem; font-size: 1.8rem;">Otras Obras del Museo</h3>
+    <!-- Sección: Otras Obras -->
+    <section class="otras-obras-section">
+        <h2 class="otras-obras-titulo">Otras Obras</h2>
         
-        <div class="grid">
+        <div class="obras-grid">
             <?php
-            // Query Secundaria: Trae 3 obras, pero EXCLUYE la que estamos viendo
             $related_args = array(
                 'post_type'      => 'obra',
-                'posts_per_page' => 3,
+                'posts_per_page' => 6,
                 'post__not_in'   => array( $current_obra_id ), 
                 'orderby'        => 'rand' 
             );
@@ -127,25 +115,31 @@ get_header(); ?>
             if ( $related_query->have_posts() ) :
                 while ( $related_query->have_posts() ) : $related_query->the_post(); ?>
                     
-                    <article class="card">
-                        <a href="<?php the_permalink(); ?>">
-                            <?php if ( has_post_thumbnail() ) : ?>
-                                <div style="height: 150px; overflow: hidden; margin-bottom: 0.5rem;">
-                                    <?php the_post_thumbnail('medium', ['style' => 'object-fit: cover; width: 100%; height: 100%;']); ?>
-                                </div>
-                            <?php endif; ?>
-                            <h4 style="font-size: 1rem;"><?php the_title(); ?></h4>
+                    <article class="obra-card">
+                        <a href="<?php the_permalink(); ?>" class="obra-link">
+                            <div class="obra-imagen">
+                                <?php if ( has_post_thumbnail() ) : ?>
+                                    <?php the_post_thumbnail('medium'); ?>
+                                    <span class="obra-plaquita"><?php the_title(); ?></span>
+                                <?php else : ?>
+                                    <div class="sin-imagen">
+                                        <span>Sin Foto</span>
+                                    </div>
+                                    <span class="obra-plaquita"><?php the_title(); ?></span>
+                                <?php endif; ?>
+                            </div>
                         </a>
                     </article>
 
                 <?php endwhile;
                 wp_reset_postdata(); 
             else : ?>
-                <p>No hay más obras para mostrar.</p>
+                <p class="no-obras">No hay más obras para mostrar.</p>
             <?php endif; ?>
         </div>
     </section>
 
+    </div>
 </main>
 
 <?php get_footer(); ?>

@@ -72,85 +72,128 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST['museo_action'] ) ) {
 
 get_header(); ?>
 
-<main class="container" style="padding: 2rem 0;">
+<main class="subir-obra-container">
+    <div class="container">
 
-    <h1 style="text-align: center; margin-bottom: 2rem;">Aportar una Obra al Museo</h1>
+        <?php if ( $mensaje_estado ) : ?>
+            <div class="mensaje-estado mensaje-<?php echo $tipo_mensaje; ?>">
+                <?php echo $mensaje_estado; ?>
+            </div>
+        <?php endif; ?>
 
-    <?php if ( $mensaje_estado ) : ?>
-        <div style="padding: 1rem; margin-bottom: 2rem; border-radius: 5px; 
-            background: <?php echo ($tipo_mensaje == 'exito') ? '#d4edda' : '#f8d7da'; ?>; 
-            color: <?php echo ($tipo_mensaje == 'exito') ? '#155724' : '#721c24'; ?>;
-            border: 1px solid <?php echo ($tipo_mensaje == 'exito') ? '#c3e6cb' : '#f5c6cb'; ?>;">
-            <?php echo $mensaje_estado; ?>
-        </div>
-    <?php endif; ?>
+        <form method="POST" enctype="multipart/form-data" class="form-subir-obra">
+            
+            <?php wp_nonce_field( 'crear_obra_nueva', 'museo_upload_nonce' ); ?>
+            <input type="hidden" name="museo_action" value="subir">
 
-    <form method="POST" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto; background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px;">
-        
-        <?php wp_nonce_field( 'crear_obra_nueva', 'museo_upload_nonce' ); ?>
-        <input type="hidden" name="museo_action" value="subir">
+            <div class="form-layout">
+                
+                <!-- Columna Izquierda: Upload de Imagen -->
+                <div class="form-upload">
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" name="imagen_obra" id="imagenObra" accept="image/*" required class="input-file">
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <div class="upload-icon">📷</div>
+                            <p class="upload-text">Click para subir imagen</p>
+                        </div>
+                        <img id="previewImage" class="preview-image" style="display: none;">
+                    </div>
+                </div>
+                
+                <!-- Columna Derecha: Campos del Formulario -->
+                <div class="form-campos">
+                    
+                    <div class="campo-grupo">
+                        <label class="campo-label">Título Obra</label>
+                        <input type="text" name="titulo_obra" class="campo-input" placeholder="Título de la obra..." required>
+                    </div>
 
-        <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Fotografía de la Obra *</label>
-            <input type="file" name="imagen_obra" accept="image/*" required style="width: 100%;">
-            <small style="color: #666;">Formatos: JPG, PNG. Máx 5MB.</small>
-        </div>
+                    <div class="campo-grupo">
+                        <label class="campo-label">Historia / Descripción</label>
+                        <textarea name="descripcion_obra" rows="6" class="campo-textarea" placeholder="Cuéntanos la historia..."></textarea>
+                    </div>
 
-        <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Título de la Obra *</label>
-            <input type="text" name="titulo_obra" placeholder="Ej: Camiseta autografiada 2001" required style="width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 4px;">
-        </div>
+                    <div class="campo-grupo">
+                        <label class="campo-label">Autor</label>
+                        <input type="text" name="autor_nombre" class="campo-input" placeholder="Tu nombre...">
+                    </div>
+                    
+                    <div class="campo-grupo">
+                        <label class="campo-label">Email</label>
+                        <input type="email" name="autor_email" class="campo-input" placeholder="Tu email...">
+                    </div>
 
-        <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Historia / Descripción</label>
-            <textarea name="descripcion_obra" rows="5" placeholder="Cuéntanos la historia detrás de este objeto..." style="width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-        </div>
+                    <button type="submit" class="btn-post">POST</button>
 
-        <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Tu Nombre (Créditos)</label>
-            <input type="text" name="autor_nombre" placeholder="¿Quién sube este recuerdo?" style="width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 4px;">
-        </div>
+                </div>
+                
+            </div>
 
-        <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; font-weight: bold; margin-bottom: 0.5rem;">Email de Contacto (Privado)</label>
-            <input type="email" name="autor_email" placeholder="Para contactarte si es necesario" style="width: 100%; padding: 0.8rem; border: 1px solid #ccc; border-radius: 4px;">
-        </div>
+        </form>
 
-        <button type="submit" class="btn" style="width: 100%; font-size: 1.2rem; cursor: pointer;">Subir Obra</button>
+        <!-- Sección: Otras Obras -->
+        <section class="otras-obras-section">
+            <h2 class="otras-obras-titulo">Otras Obras</h2>
+            
+            <div class="obras-grid">
+                <?php
+                $recent_args = array(
+                    'post_type'      => 'obra',
+                    'posts_per_page' => 6,
+                    'post_status'    => 'publish',
+                    'orderby'        => 'date',
+                    'order'          => 'DESC'
+                );
+                $recent_query = new WP_Query( $recent_args );
 
-    </form>
-
-    <hr style="margin: 4rem 0; border-top: 2px solid #eee;">
-
-    <section>
-        <h3 style="text-align: center; margin-bottom: 2rem;">Últimas Obras Agregadas</h3>
-        <div class="grid">
-            <?php
-            $recent_args = array(
-                'post_type'      => 'obra',
-                'posts_per_page' => 4,
-                'post_status'    => 'publish', // Solo mostramos las aprobadas
-                'orderby'        => 'date',
-                'order'          => 'DESC'
-            );
-            $recent_query = new WP_Query( $recent_args );
-
-            if ( $recent_query->have_posts() ) :
-                while ( $recent_query->have_posts() ) : $recent_query->the_post(); ?>
-                    <article class="card">
-                        <a href="<?php the_permalink(); ?>">
-                            <?php if ( has_post_thumbnail() ) : ?>
-                                <div style="height: 150px; overflow: hidden; margin-bottom: 0.5rem;">
-                                    <?php the_post_thumbnail('medium', ['style' => 'object-fit: cover; width: 100%; height: 100%;']); ?>
+                if ( $recent_query->have_posts() ) :
+                    while ( $recent_query->have_posts() ) : $recent_query->the_post(); ?>
+                        
+                        <article class="obra-card">
+                            <a href="<?php the_permalink(); ?>" class="obra-link">
+                                <div class="obra-imagen">
+                                    <?php if ( has_post_thumbnail() ) : ?>
+                                        <?php the_post_thumbnail('medium'); ?>
+                                        <span class="obra-plaquita"><?php the_title(); ?></span>
+                                    <?php else : ?>
+                                        <div class="sin-imagen">
+                                            <span>Sin Foto</span>
+                                        </div>
+                                        <span class="obra-plaquita"><?php the_title(); ?></span>
+                                    <?php endif; ?>
                                 </div>
-                            <?php endif; ?>
-                            <h4><?php the_title(); ?></h4>
-                        </a>
-                    </article>
-                <?php endwhile; wp_reset_postdata(); endif; ?>
-        </div>
-    </section>
+                            </a>
+                        </article>
 
+                    <?php endwhile;
+                    wp_reset_postdata(); 
+                endif; ?>
+            </div>
+        </section>
+
+    </div>
 </main>
+
+<script>
+// Preview de imagen al seleccionar
+document.getElementById('imagenObra').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('uploadPlaceholder').style.display = 'none';
+            const preview = document.getElementById('previewImage');
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    }
+});
+
+// Click en el área para abrir selector de archivos
+document.getElementById('uploadArea').addEventListener('click', function() {
+    document.getElementById('imagenObra').click();
+});
+</script>
 
 <?php get_footer(); ?>

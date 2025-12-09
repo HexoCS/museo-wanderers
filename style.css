@@ -477,15 +477,15 @@ header {
     bottom: 5%; /* Bajado más */
     left: 50%;
     transform: translateX(-50%);
-    width: 60%; /* Ancho de la plaquita dorada */
-    max-width: 200px;
+    width: 50%; /* Reducido para que no se salga */
+    max-width: 180px;
     text-align: center;
     z-index: 3; /* Por encima del marco */
     padding: 0.3rem 0.5rem;
     
     /* Texto */
     font-family: var(--font-titulo);
-    font-size: 0.75rem;
+    font-size: 0.7rem; /* Ligeramente más pequeño */
     font-weight: 500;
     color: var(--color-blanco); /* Blanco como los demás textos */
     text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Sombra más fuerte para legibilidad sobre dorado */
@@ -499,7 +499,7 @@ header {
 }
 
 .obra-card:hover .obra-imagen img {
-    transform: scale(1.03); /* Reducido de 1.05 a 1.03 para evitar que sobresalga del marco */
+    transform: scale(1.02); /* Reducido a 1.02 para evitar completamente que sobresalga del marco */
 }
 
 .sin-imagen {
@@ -569,5 +569,400 @@ header {
     
     .search-bar form {
         flex-direction: column;
+    }
+}
+
+/* =========================================
+   7. VISTA DE OBRA INDIVIDUAL (single-obra.php)
+   ========================================= */
+
+.single-obra-container {
+    padding: 3rem 0;
+    min-height: 60vh;
+}
+
+.obra-detalle {
+    background-color: transparent; /* Sin fondo blanco */
+    border-radius: var(--radio-borde);
+    padding: 2rem;
+    margin-bottom: 4rem;
+}
+
+/* Layout de 2 Columnas */
+.obra-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+/* Imagen Grande (Sin Marco) */
+.obra-imagen-grande {
+    width: 100%;
+    background-color: #f5f5f5;
+    border-radius: var(--radio-borde);
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.obra-imagen-grande img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.sin-imagen-grande {
+    width: 100%;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e0e0e0;
+    color: #999;
+    font-size: 1.2rem;
+}
+
+/* Información de la Obra */
+.obra-info-detalle {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.obra-titulo-detalle {
+    font-family: var(--font-titulo);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--color-blanco);
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.obra-contenido {
+    color: var(--color-blanco);
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.obra-autor {
+    color: var(--color-blanco);
+}
+
+.obra-autor strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.obra-autor p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/* Botones de Votación */
+.votos-container {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn-voto {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-cuerpo);
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: transparent;
+}
+
+.icono-voto-svg {
+    width: 50px;
+    height: 50px;
+    transition: transform 0.3s ease;
+}
+
+.btn-voto:hover:not(:disabled) .icono-voto-svg {
+    transform: scale(1.1);
+}
+
+.btn-like {
+    color: var(--color-blanco);
+}
+
+.btn-dislike {
+    color: var(--color-blanco);
+}
+
+.btn-voto:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.contador-voto {
+    color: var(--color-blanco);
+    font-weight: 600;
+}
+
+/* Etiquetas de la Obra */
+.etiquetas-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.etiqueta-badge {
+    background-color: var(--color-secundario);
+    color: var(--color-blanco);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.etiqueta-badge:hover {
+    background-color: #d4b06a;
+    transform: translateY(-2px);
+}
+
+/* Sección Otras Obras */
+.otras-obras-section {
+    margin-top: 4rem;
+}
+
+.otras-obras-titulo {
+    font-family: var(--font-titulo);
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: var(--color-blanco);
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+}
+
+/* Responsive Vista Individual */
+@media (max-width: 768px) {
+    .obra-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .obra-titulo-detalle {
+        font-size: 1.5rem;
+    }
+    
+    .votos-container {
+        flex-direction: column;
+    }
+    
+    .btn-voto {
+        justify-content: center;
+    }
+}
+
+/* =========================================
+   8. PÁGINA SUBIR OBRA (page-subir-obra.php)
+   ========================================= */
+
+.subir-obra-container {
+    padding: 3rem 0;
+    min-height: 60vh;
+}
+
+/* Mensajes de Estado */
+.mensaje-estado {
+    padding: 1rem 2rem;
+    margin-bottom: 2rem;
+    border-radius: var(--radio-borde);
+    font-weight: 500;
+    text-align: center;
+}
+
+.mensaje-exito {
+    background-color: #d4edda;
+    color: #155724;
+    border: 2px solid #c3e6cb;
+}
+
+.mensaje-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 2px solid #f5c6cb;
+}
+
+/* Formulario */
+.form-subir-obra {
+    margin-bottom: 4rem;
+}
+
+.form-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+/* Columna Izquierda: Campos */
+.form-campos {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.campo-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.campo-label {
+    font-family: var(--font-titulo);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-blanco);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.campo-input,
+.campo-textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radio-borde);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--color-blanco);
+    font-family: var(--font-cuerpo);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.campo-input::placeholder,
+.campo-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.campo-input:focus,
+.campo-textarea:focus {
+    outline: none;
+    border-color: var(--color-secundario);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.campo-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Botón POST */
+.btn-post {
+    background-color: var(--color-secundario);
+    color: var(--color-blanco);
+    padding: 1rem 3rem;
+    border: none;
+    border-radius: var(--radio-borde);
+    font-family: var(--font-titulo);
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: flex-start;
+}
+
+.btn-post:hover {
+    background-color: #d4b06a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(197, 160, 89, 0.4);
+}
+
+/* Columna Derecha: Upload */
+.form-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.upload-area {
+    width: 100%;
+    aspect-ratio: 4/3;
+    border: 3px dashed rgba(255, 255, 255, 0.3);
+    border-radius: var(--radio-borde);
+    background-color: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-area:hover {
+    border-color: var(--color-secundario);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.input-file {
+    display: none;
+}
+
+.upload-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.upload-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.upload-text {
+    color: var(--color-blanco);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.campo-input-small {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radio-borde);
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--color-blanco);
+    font-family: var(--font-cuerpo);
+    font-size: 0.9rem;
+}
+
+.campo-input-small::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Responsive Subir Obra */
+@media (max-width: 768px) {
+    .form-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .btn-post {
+        width: 100%;
     }
 }
