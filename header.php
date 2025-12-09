@@ -30,7 +30,7 @@
         
         <div class="logo-container">
             <a href="<?php echo home_url(); ?>">
-                <img src="<?php echo get_template_directory_uri(); ?>/assets/svg/logo_corpo.svg" alt="Wanderers" class="escudo-big">
+                <img src="<?php echo get_template_directory_uri(); ?>/assets/images/logo_blanco.png" alt="Wanderers" class="escudo-big">
             </a>
         </div>
 
