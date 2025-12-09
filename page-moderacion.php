@@ -54,7 +54,7 @@ get_header();
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
         <h1>Panel de Moderación</h1>
-        <a href="<?php echo admin_url('edit.php?post_type=obra'); ?>" class="btn" style="background:#333;">Ver Todo en Backend</a>
+        <a href="<?php echo admin_url('edit.php?post_type=obra'); ?>" class="btn" style="background:#333;">Ver Todo en wp-admin</a>
     </div>
 
     <?php echo $msg; ?>
@@ -73,51 +73,68 @@ get_header();
         ?>
         <p>Hay <strong><?php echo $pendientes->found_posts; ?></strong> obras esperando revisión.</p>
         
-        <div style="display: flex; flex-direction: column; gap: 2rem; margin-top: 1rem;">
-            <?php while ( $pendientes->have_posts() ) : $pendientes->the_post(); ?>
+        <div class="obras-moderacion-grid">
+            <?php while ( $pendientes->have_posts() ) : $pendientes->the_post(); 
+            
+                $imagen_url = get_the_post_thumbnail_url( get_the_ID(), 'large' );
+                if ( ! $imagen_url ) {
+                    $imagen_url = get_template_directory_uri() . '/assets/images/placeholder.jpg';
+                }
                 
-                <article style="border: 2px solid #0f4c29; padding: 1.5rem; background: white; border-radius: 8px; display: grid; grid-template-columns: 250px 1fr; gap: 2rem;">
+                $autor = get_post_meta( get_the_ID(), 'nombre_autor_externo', true ) ?: 'No especificado';
+                $email = get_post_meta( get_the_ID(), 'email_contacto', true ) ?: 'No especificado';
+            ?>
+                
+                <article class="obra-moderacion-card">
                     
-                    <div style="background: #eee; display: flex; align-items: center; justify-content: center; height: 250px;">
-                        <?php if ( has_post_thumbnail() ) : ?>
-                            <?php the_post_thumbnail('medium', ['style' => 'max-height:100%; max-width:100%; object-fit:contain;']); ?>
-                        <?php else : ?>
-                            <span>Sin Foto</span>
-                        <?php endif; ?>
-                    </div>
+                    <!-- Imagen con marco clickeable -->
+                    <a href="<?php echo esc_url( $imagen_url ); ?>" class="obra-imagen-moderacion" target="_blank">
+                        <img src="<?php echo esc_url( $imagen_url ); ?>" alt="<?php the_title(); ?>">
+                    </a>
 
-                    <div>
-                        <h2 style="margin-top: 0;"><?php the_title(); ?></h2>
+                    <!-- Información de la obra y controles -->
+                    <div class="obra-moderacion-info">
+                        <h3 class="obra-moderacion-titulo"><?php the_title(); ?></h3>
+                        <p class="obra-moderacion-descripcion"><?php echo wp_trim_words( get_the_content(), 20 ); ?></p>
                         
-                        <div style="background: #f9f9f9; padding: 1rem; margin: 1rem 0; font-size: 0.9rem;">
-                            <p><strong>Autor (Crédito):</strong> <?php echo get_post_meta(get_the_ID(), 'nombre_autor_externo', true); ?></p>
-                            <p><strong>Email:</strong> <?php echo get_post_meta(get_the_ID(), 'email_contacto', true); ?></p>
-                            <p><strong>Descripción:</strong></p>
-                            <div style="font-style: italic;"><?php the_content(); ?></div>
+                        <div class="obra-moderacion-meta">
+                            <p><strong>Autor:</strong> <?php echo esc_html( $autor ); ?></p>
+                            <p><strong>Email:</strong> <?php echo esc_html( $email ); ?></p>
+                            <p><strong>Fecha:</strong> <?php echo get_the_date(); ?></p>
                         </div>
 
-                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                        <!-- Formulario de etiquetas y acciones -->
+                        <div class="obra-moderacion-controles">
+                        <form method="POST" class="obra-moderacion-form-tags">
+                            <?php wp_nonce_field( 'procesar_obra', 'mod_nonce' ); ?>
+                            <input type="hidden" name="obra_id" value="<?php the_ID(); ?>">
+                            <input type="hidden" name="moderacion_action" value="aprobar">
                             
-                            <form method="POST" style="display: flex; flex-direction: column; gap: 0.5rem; background: #e8f5e9; padding: 10px; border-radius: 5px; width: 100%; max-width: 300px;">
-                                <?php wp_nonce_field( 'procesar_obra', 'mod_nonce' ); ?>
-                                <input type="hidden" name="obra_id" value="<?php the_ID(); ?>">
-                                <input type="hidden" name="moderacion_action" value="aprobar">
+                            <label>Etiquetas (separar con comas):</label>
+                            <input type="text" name="tags_input" placeholder="Ej: 1970, camiseta, final">
+                            
+                            <div class="obra-moderacion-acciones">
+                                <!-- Aprobar -->
+                                <button type="submit" class="btn-accion btn-aprobar" title="Aprobar y Publicar">
+                                    <img src="<?php echo get_template_directory_uri(); ?>/assets/svg/like.svg" alt="Aprobar" class="icono-accion-svg">
+                                </button>
+                        </form>
                                 
-                                <label style="font-size: 0.8rem; font-weight: bold; color: #155724;">Etiquetas (separar con comas):</label>
-                                <input type="text" name="tags_input" placeholder="Ej: 1970, camiseta, final" 
-                                       style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
-                                
-                                <button type="submit" class="btn" style="border:none; cursor:pointer; margin-top: 5px;">✅ Aprobar y Publicar</button>
-                            </form>
+                                <!-- Rechazar -->
+                                <form method="POST" onsubmit="return confirm('¿Estás seguro de borrar esta obra?');" style="display: inline;">
+                                    <?php wp_nonce_field( 'procesar_obra', 'mod_nonce' ); ?>
+                                    <input type="hidden" name="obra_id" value="<?php the_ID(); ?>">
+                                    <input type="hidden" name="moderacion_action" value="rechazar">
+                                    <button type="submit" class="btn-accion btn-rechazar" title="Rechazar">
+                                        <img src="<?php echo get_template_directory_uri(); ?>/assets/svg/dislike.svg" alt="Rechazar" class="icono-accion-svg">
+                                    </button>
+                                </form>
 
-                            <form method="POST" onsubmit="return confirm('¿Estás seguro de borrar esta obra?');" style="margin-top: auto;">
-                                <?php wp_nonce_field( 'procesar_obra', 'mod_nonce' ); ?>
-                                <input type="hidden" name="obra_id" value="<?php the_ID(); ?>">
-                                <input type="hidden" name="moderacion_action" value="rechazar">
-                                <button type="submit" class="btn" style="background:#dc3545; border:none; cursor:pointer;">🗑 Rechazar</button>
-                            </form>
-
-                            <a href="<?php echo get_edit_post_link(); ?>" target="_blank" class="btn" style="background:#007bff; text-decoration:none; margin-top: auto;">✏️ Editar Datos</a>
+                                <!-- Editar -->
+                                <a href="<?php echo get_edit_post_link(); ?>" target="_blank" class="btn-accion btn-editar" title="Editar Datos">
+                                    <img src="<?php echo get_template_directory_uri(); ?>/assets/svg/edit.svg" alt="Editar" class="icono-accion-svg">
+                                </a>
+                            </div>
                         </div>
                     </div>
 
@@ -128,7 +145,7 @@ get_header();
 
     <?php else : ?>
         
-        <div style="text-align: center; padding: 4rem; background: #fff; border: 1px dashed #ccc;">
+        <div style="text-align: center; padding: 4rem; background: #08311f; border: 1px dashed #ccc;">
             <h3>¡Todo al día!</h3>
             <p>No hay obras pendientes de revisión.</p>
         </div>
