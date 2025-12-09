@@ -41,26 +41,13 @@
                             <div class="obra-imagen">
                                 <?php if ( has_post_thumbnail() ) : ?>
                                     <?php the_post_thumbnail('medium'); ?>
+                                    <span class="obra-plaquita"><?php the_title(); ?></span>
                                 <?php else : ?>
                                     <div class="sin-imagen">
                                         <span>Sin Foto</span>
                                     </div>
+                                    <span class="obra-plaquita"><?php the_title(); ?></span>
                                 <?php endif; ?>
-                            </div>
-                            
-                            <div class="obra-info">
-                                <h3 class="obra-titulo"><?php the_title(); ?></h3>
-                                <p class="obra-autor">
-                                    <?php 
-                                    $autor_externo = get_post_meta( get_the_ID(), 'nombre_autor_externo', true );
-                                    
-                                    if ( ! empty( $autor_externo ) ) {
-                                        echo esc_html( $autor_externo );
-                                    } else {
-                                        the_author();
-                                    }
-                                    ?>
-                                </p>
                             </div>
                         </a>
                     </article>
