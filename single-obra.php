@@ -139,6 +139,13 @@ get_header(); ?>
         </div>
     </section>
 
+    <!-- Sección: Comentarios -->
+    <?php if ( comments_open() || get_comments_number() ) : ?>
+        <section class="comentarios-section">
+            <?php comments_template(); ?>
+        </section>
+    <?php endif; ?>
+
     </div>
 </main>
 

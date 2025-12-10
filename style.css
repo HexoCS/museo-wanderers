@@ -1243,3 +1243,175 @@ header {
         margin: 1.5rem 0 2rem 0;
     }
 }
+
+/* =====================================================
+   11. COMENTARIOS (comments.php / single-obra.php)
+   ===================================================== */
+
+.comentarios-section {
+    max-width: 1400px;
+    margin: 4rem auto 0 auto;
+    padding: 3rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--color-primario);
+    border-radius: 12px;
+}
+
+/* Título de comentarios */
+.comments-title,
+.comment-reply-title {
+    font-size: 1.8rem;
+    color: var(--color-secundario);
+    margin-bottom: 2rem;
+    font-family: 'Poppins-Medium', sans-serif;
+}
+
+/* Botón cancelar respuesta */
+#cancel-comment-reply-link {
+    display: inline-block;
+    margin-left: 1rem;
+    padding: 0.5rem 1.2rem;
+    background: rgba(220, 53, 69, 0.8);
+    color: var(--color-blanco);
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-family: 'Poppins-Regular', sans-serif;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(220, 53, 69, 1);
+}
+
+#cancel-comment-reply-link:hover {
+    background: rgba(220, 53, 69, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
+}
+
+/* Lista de comentarios */
+.comment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 3rem 0;
+}
+
+.comment {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--color-secundario);
+}
+
+.comment-author {
+    font-weight: bold;
+    color: var(--color-secundario);
+    margin-bottom: 0.5rem;
+}
+
+.comment-meta {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1rem;
+}
+
+.comment-content {
+    color: var(--color-blanco);
+    line-height: 1.6;
+}
+
+.comment-content p {
+    margin: 0.5rem 0;
+}
+
+/* Formulario de comentarios */
+.comment-form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.comment-form-comment,
+.comment-form-author,
+.comment-form-email {
+    display: flex;
+    flex-direction: column;
+}
+
+.comment-form label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--color-secundario);
+    margin-bottom: 0.5rem;
+}
+
+.comment-form input[type="text"],
+.comment-form input[type="email"],
+.comment-form textarea {
+    padding: 1rem;
+    border: 2px solid var(--color-primario);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-blanco);
+    font-size: 1rem;
+    font-family: 'Poppins-Regular', sans-serif;
+}
+
+.comment-form input[type="text"]:focus,
+.comment-form input[type="email"]:focus,
+.comment-form textarea:focus {
+    outline: none;
+    border-color: var(--color-secundario);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.comment-form textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-submit {
+    margin: 0;
+}
+
+.submit {
+    padding: 1rem 2.5rem;
+    background: var(--color-secundario);
+    color: var(--color-primario);
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Poppins-Medium', sans-serif;
+}
+
+.submit:hover {
+    background: var(--color-blanco);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(197, 160, 89, 0.4);
+}
+
+/* Mensaje cuando no hay comentarios */
+.no-comments {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 2rem;
+    font-style: italic;
+}
+
+/* Responsive Comentarios */
+@media (max-width: 768px) {
+    .comentarios-section {
+        padding: 2rem 1.5rem;
+        margin-top: 3rem;
+    }
+    
+    .comments-title,
+    .comment-reply-title {
+        font-size: 1.5rem;
+    }
+    
+    .comment {
+        padding: 1rem;
+    }
+}

@@ -37,7 +37,7 @@ function museo_registrar_cpt() {
         'public' => true,
         'has_archive' => true,
         'menu_icon' => 'dashicons-format-gallery',
-        'supports' => array( 'title', 'editor', 'thumbnail', 'custom-fields', 'author' ),
+        'supports' => array( 'title', 'editor', 'thumbnail', 'custom-fields', 'author', 'comments' ),
         'rewrite' => array( 'slug' => 'obra' ),
     );
     register_post_type( 'obra', $args );
@@ -173,3 +173,17 @@ function museo_buscar_en_tags( $search, $wp_query ) {
     return $search;
 }
 add_filter( 'posts_search', 'museo_buscar_en_tags', 500, 2 );
+// ============================================
+// TRADUCCIONES DE COMENTARIOS
+// ============================================
+
+// Traducir mensaje de moderación
+add_filter( 'comment_moderation_text', function( $text ) {
+    return 'Tu comentario está esperando moderación. Esta es una vista previa; tu comentario será visible después de que sea aprobado.';
+});
+
+// Traducir "says:"
+add_filter( 'comment_author_says_text', function( $text ) {
+    return 'dice:';
+});
+
