@@ -10,9 +10,9 @@
         </div>
 
         <!-- Barra de Búsqueda -->
-        <div class="search-bar">
+        <div class="barra-busqueda">
             <form role="search" method="get" action="<?php echo home_url( '/' ); ?>">
-                <input type="text" value="<?php echo get_search_query(); ?>" name="s" placeholder="Buscar: '1970', 'Camiseta'..." class="search-input">
+                <input type="text" value="<?php echo get_search_query(); ?>" name="s" placeholder="Buscar en el museo..." class="input-busqueda">
                 <button type="submit" class="btn-buscar">🔍 Buscar</button>
             </form>
         </div>

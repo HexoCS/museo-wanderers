@@ -45,7 +45,7 @@ get_header(); ?>
                     </div>
                     
                     <div class="obra-autor">
-                        <strong>Nombre Autor</strong>
+                        <strong>Autor: </strong>
                         <p>
                             <?php 
                             $autor_externo = get_post_meta( get_the_ID(), 'nombre_autor_externo', true );
