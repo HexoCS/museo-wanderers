@@ -39,32 +39,41 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_POST['museo_action'] ) ) {
 
         if ( $post_id ) {
             // E. Guardar Metadatos (Autor y Email)
-            // Usamos Custom Fields para guardar datos que no son título/body
             update_post_meta( $post_id, 'nombre_autor_externo', $autor_nombre );
             update_post_meta( $post_id, 'email_contacto', $autor_email );
 
-            // F. Manejo del Archivo 
-            if ( ! function_exists( 'wp_handle_upload' ) ) {
-                require_once( ABSPATH . 'wp-admin/includes/image.php' );
-                require_once( ABSPATH . 'wp-admin/includes/file.php' );
-                require_once( ABSPATH . 'wp-admin/includes/media.php' );
-            }
+            // F. Manejo del Archivo (FIX CRÍTICO DE INGENIERÍA)
+            // ------------------------------------------------------------------
+            // Forzamos la carga de librerías de administración aunque estemos en frontend
+            require_once( ABSPATH . 'wp-admin/includes/image.php' );
+            require_once( ABSPATH . 'wp-admin/includes/file.php' );
+            require_once( ABSPATH . 'wp-admin/includes/media.php' );
 
-            // Subir archivo al servidor
-            $attachment_id = media_handle_upload( 'imagen_obra', $post_id );
-
-            if ( is_wp_error( $attachment_id ) ) {
-                $mensaje_estado = "Error al subir la imagen: " . $attachment_id->get_error_message();
-                $tipo_mensaje = "error";
+            // Verificación extra de integridad del archivo recibido
+            if ( empty($_FILES['imagen_obra']) || $_FILES['imagen_obra']['error'] !== UPLOAD_ERR_OK ) {
+                 // Si PHP no pudo subir el archivo (ej: límite de tamaño excedido antes de procesar)
+                 $mensaje_estado = "Error crítico: La imagen no pudo ser procesada por el servidor.";
+                 $tipo_mensaje = "error";
             } else {
-                // Asignar como Imagen Destacada
-                set_post_thumbnail( $post_id, $attachment_id );
-                
-                $mensaje_estado = "¡Gracias! Tu obra ha sido recibida y está en revisión";
-                $tipo_mensaje = "exito";
+                // Intentamos procesar la subida con WordPress
+                $attachment_id = media_handle_upload( 'imagen_obra', $post_id );
+
+                if ( is_wp_error( $attachment_id ) ) {
+                    // Error específico de WordPress (ej: tipo de archivo no permitido)
+                    $mensaje_estado = "Error al guardar la imagen: " . $attachment_id->get_error_message();
+                    $tipo_mensaje = "error";
+                } else {
+                    // ¡Éxito total! Asignamos la miniatura
+                    set_post_thumbnail( $post_id, $attachment_id );
+                    
+                    $mensaje_estado = "¡Gracias! Tu obra ha sido recibida y está en revisión.";
+                    $tipo_mensaje = "exito";
+                }
             }
+            // ------------------------------------------------------------------
+
         } else {
-            $mensaje_estado = "Hubo un error al guardar la información.";
+            $mensaje_estado = "Hubo un error al guardar la información en la base de datos.";
             $tipo_mensaje = "error";
         }
     }
@@ -88,7 +97,6 @@ get_header(); ?>
 
             <div class="form-layout">
                 
-                <!-- Columna Izquierda: Upload de Imagen -->
                 <div class="form-upload">
                     <div class="upload-area" id="uploadArea">
                         <input type="file" name="imagen_obra" id="imagenObra" accept="image/*" required class="input-file">
@@ -100,7 +108,6 @@ get_header(); ?>
                     </div>
                 </div>
                 
-                <!-- Columna Derecha: Campos del Formulario -->
                 <div class="form-campos">
                     
                     <div class="campo-grupo">
@@ -131,7 +138,6 @@ get_header(); ?>
 
         </form>
 
-        <!-- Sección: Otras Obras -->
         <section class="otras-obras-section">
             <h2 class="otras-obras-titulo">Otras Obras</h2>
             
